@@ -20,40 +20,40 @@
     <div id="logOutput">Memuat log dari Firebase...</div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script>
-    const auth = firebase.auth();
-    const db = firebase.database();
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { firebaseConfig } from './firebase-config.js';
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
     const ADMIN_UID = "K9UyAAUju5TMhrPIes56e1RGbmI3";
 
     function login() {
       const email = document.getElementById("email").value;
       const pass = document.getElementById("password").value;
 
-      auth.signInWithEmailAndPassword(email, pass)
-        .then(() => {
-          document.getElementById("loginBox").style.display = "none";
-        })
+      signInWithEmailAndPassword(auth, email, pass)
         .catch((error) => {
           document.getElementById("loginError").innerText = "Login gagal: " + error.message;
         });
     }
 
-    auth.onAuthStateChanged((user) => {
+    onAuthStateChanged(auth, (user) => {
       if (user && user.uid === ADMIN_UID) {
+        document.getElementById("loginBox").style.display = "none";
         document.getElementById("logContainer").style.display = "block";
         loadLogs();
       } else if (user) {
         document.getElementById("loginError").innerText = "❌ Akses ditolak: Bukan admin!";
-        auth.signOut();
+        signOut(auth);
       }
     });
 
     function loadLogs() {
-      db.ref("logs").on("value", (snapshot) => {
+      onValue(ref(db, "logs"), (snapshot) => {
         const logs = snapshot.val();
         const logOutput = document.getElementById("logOutput");
         logOutput.innerHTML = "";
@@ -64,13 +64,15 @@
         }
 
         Object.entries(logs).reverse().forEach(([id, data]) => {
-          const logText = `> Target: ${data.target}\n  Jenis: ${data.jenis}\n  Waktu: ${data.waktu}\n  IP Client: ${data.ipClient || '-'}\n\n`;
+          const logText = `> Target: ${data.target}\n  Jenis: ${data.jenis}\n  Waktu: ${data.waktu}\n\n`;
           const entry = document.createElement("pre");
           entry.innerText = logText;
           logOutput.appendChild(entry);
         });
       });
     }
+
+    window.login = login;
   </script>
 </body>
 </html>
