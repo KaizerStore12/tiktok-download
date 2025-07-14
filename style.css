@@ -1,0 +1,31 @@
+body {
+  background-color: #000;
+  color: #00ff00;
+  font-family: monospace;
+  padding: 20px;
+}
+
+.terminal {
+  max-width: 600px;
+  margin: auto;
+}
+
+input, button {
+  font-family: monospace;
+  background: black;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #003300;
+  cursor: pointer;
+}
+
+.output {
+  margin-top: 20px;
+  white-space: pre-wrap;
+}

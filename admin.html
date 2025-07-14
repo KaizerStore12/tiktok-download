@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - OSINT Log</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="terminal" id="loginBox">
+    <pre>> Login Admin</pre>
+    <input type="email" id="email" placeholder="Email admin">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">🔐 Login</button>
+    <div id="loginError" style="color:red;"></div>
+  </div>
+
+  <div class="terminal" id="logContainer" style="display:none;">
+    <pre>> OSINT Admin Panel</pre>
+    <div id="logOutput">Memuat log dari Firebase...</div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const ADMIN_UID = "K9UyAAUju5TMhrPIes56e1RGbmI3";
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(() => {
+          document.getElementById("loginBox").style.display = "none";
+        })
+        .catch((error) => {
+          document.getElementById("loginError").innerText = "Login gagal: " + error.message;
+        });
+    }
+
+    auth.onAuthStateChanged((user) => {
+      if (user && user.uid === ADMIN_UID) {
+        document.getElementById("logContainer").style.display = "block";
+        loadLogs();
+      } else if (user) {
+        document.getElementById("loginError").innerText = "❌ Akses ditolak: Bukan admin!";
+        auth.signOut();
+      }
+    });
+
+    function loadLogs() {
+      db.ref("logs").on("value", (snapshot) => {
+        const logs = snapshot.val();
+        const logOutput = document.getElementById("logOutput");
+        logOutput.innerHTML = "";
+
+        if (!logs) {
+          logOutput.innerText = "> Belum ada data log.";
+          return;
+        }
+
+        Object.entries(logs).reverse().forEach(([id, data]) => {
+          const logText = `> Target: ${data.target}\n  Jenis: ${data.jenis}\n  Waktu: ${data.waktu}\n  IP Client: ${data.ipClient || '-'}\n\n`;
+          const entry = document.createElement("pre");
+          entry.innerText = logText;
+          logOutput.appendChild(entry);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

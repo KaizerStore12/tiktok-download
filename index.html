@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OSINT Terminal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="terminal">
+    <pre>> OSINT Panel v1.0</pre>
+    <pre>> Masukkan target (IP, domain, username, nomor):</pre>
+    <input type="text" id="inputTarget" placeholder="Contoh: 8.8.8.8 atau tiktokuser" />
+    <button onclick="startLookup()">🔍 Lacak</button>
+    <div id="output" class="output"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
